@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư viện PTIT</title>
+    <link rel="icon" href="../img/logo_web_page_circle.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/data.css">
+    <style>
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <ul>
+                {% for table_name in data.keys() %}
+                    <li onclick="showTable('{{ table_name }}')" id="btn-{{ table_name }}">{{ table_name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="content">
+            <div >
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm trong tất cả các bảng...">
+                    <button id="searchButton"><i class="fas fa-search"></i></button>
+                </div>
+                {% for table_name, content in data.items() %}
+                    <div id="table-{{ table_name }}" class="table-wrapper">
+                        <h2>Bảng: {{ table_name }}</h2>
+                        <div>
+                            <button  class="add-new-btn" data-table="{{ table_name }}" data-columns="{{ content.columns|join(',') }}">➕ Thêm mới</button>
+                             <button class="toggle-edit-mode-btn" title="Chế độ sửa">✏️ Sửa</button> 
+                            <button class="toggle-delete-mode-btn" title="Chế độ xóa">🗑️ Xóa</button>   
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    {% for col in content.columns %}
+                                        <th>{{ col }}</th>
+                                    {% endfor %}
+                                    <th class="col-edit">Hành động</th> 
+                                    <th class="col-delete">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in content.rows %}
+                                    <tr data-row-id="{{ row[0] }}">
+                                        {% for cell in row %}
+                                            <td data-column-name="{{ content.columns[loop.index0] }}">{{ cell }}</td>
+                                        {% endfor %}
+                                        <td class="col-edit">
+                                            <button class="edit-row-btn" data-id="{{ row[0] }}" title="Sửa hàng này">
+                                                ✏️
+                                            </button>
+                                        </td>
+                                        <td class="col-delete">
+                                            <button class="delete-row-btn" data-id="{{ row[0] }}" title="Xóa hàng này">
+                                                ❌
+                                            </button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div id="add-data-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-title">Thêm dữ liệu mới</h3>
+                    <button type="button" class="btn-close-modal" title="Đóng">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-data-form">
+                        <div id="modal-form-fields">
+                            </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel">Hủy</button>
+                    <button type="submit" form="add-data-form" class="btn-save">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTable(tableName) {
+            // Lấy phần tử thanh tìm kiếm
+            const searchContainer = document.querySelector('.search-container');
+            searchContainer.style.display = 'flex';
+            // Ẩn tất cả các bảng
+            document.querySelectorAll('.table-wrapper').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Bỏ class active khỏi sidebar cũ
+            document.querySelectorAll('.sidebar li').forEach(li => {
+                li.classList.remove('active');
+            });
+
+            // Hiện bảng được chọn
+            document.getElementById('table-' + tableName).classList.add('active');
+            document.getElementById('btn-' + tableName).classList.add('active');
+        }
+
+        // Mặc định hiển thị bảng đầu tiên
+        window.onload = function() {
+            const firstBtn = document.querySelector('.sidebar li');
+            if (firstBtn) {
+                firstBtn.click();
+            }
+        }
+         function searchTables() {
+            // Lấy từ khóa tìm kiếm và chuyển thành chữ thường
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Lấy tất cả các table-wrapper trừ cái của CV
+            const tableWrappers = document.querySelectorAll('.table-wrapper:not(#table-cv)');
+
+            // Lặp qua từng bảng dữ liệu
+            tableWrappers.forEach(wrapper => {
+                const rows = wrapper.querySelectorAll('tbody tr');
+                
+                // Lặp qua từng hàng của bảng
+                rows.forEach(row => {
+                    const rowText = row.textContent.toLowerCase();
+                    
+                    // Nếu nội dung hàng chứa từ khóa tìm kiếm, thì hiện nó ra
+                    // Ngược lại, ẩn nó đi
+                    if (rowText.includes(searchTerm)) {
+                        row.style.display = ''; // Hiện hàng
+                    } else {
+                        row.style.display = 'none'; // Ẩn hàng
+                    }
+                });
+            });
+        }
+
+        // Gắn sự kiện 'click' cho nút tìm kiếm
+        document.getElementById('searchButton').addEventListener('click', searchTables);
+
+        // Gắn sự kiện 'keyup' để khi nhấn Enter cũng thực hiện tìm kiếm
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchTables();
+            }
+        });
+
+    const modal = document.getElementById('add-data-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalFormFields = document.getElementById('modal-form-fields');
+        const addDataForm = document.getElementById('add-data-form');
+        let currentTable = '';
+
+        // SỬA ĐỔI: Hàm mở Modal để xử lý cả Thêm và Sửa
+        function openDataModal(tableName, columns, rowData = null) {
+            currentTable = tableName;
+            modalFormFields.innerHTML = '';
+            addDataForm.reset(); // Xóa dữ liệu form cũ
+
+            const primaryKey = columns[0].toLowerCase();
+
+            if (rowData) {
+                // Chế độ Sửa
+                modalTitle.textContent = 'Sửa dữ liệu';
+                addDataForm.dataset.mode = 'edit';
+                addDataForm.dataset.rowId = rowData[columns[0]]; 
+
+                columns.forEach(column => {
+                    const isPrimaryKey = column === columns[0];
+
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    const label = document.createElement('label');
+                    label.setAttribute('for', column);
+                    label.textContent = column;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = column;
+                    input.name = column;
+
+                    // Trong chế độ sửa, khóa chính chỉ hiển thị, không cho phép chỉnh sửa
+                    if (isPrimaryKey) {
+                        input.readOnly = true;
+                    }
+                    
+                    if (rowData[column] !== undefined) {
+                        input.value = rowData[column];
+                    }
+
+                    formGroup.appendChild(label);
+                    formGroup.appendChild(input);
+                    modalFormFields.appendChild(formGroup);
+                });
+
+            } else {
+                // Chế độ Thêm
+                modalTitle.textContent = 'Thêm dữ liệu mới';
+                addDataForm.dataset.mode = 'add';
+                addDataForm.dataset.rowId = '';
+
+                // Bỏ qua cột đầu tiên (khóa chính) khi tạo form thêm mới
+                columns.slice(1).forEach(column => {
+                    const formGroup = document.createElement('div');
+                    formGroup.className = 'form-group';
+                    const label = document.createElement('label');
+                    label.setAttribute('for', column);
+                    label.textContent = column;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.id = column;
+                    input.name = column;
+                    input.required = true;
+
+                    formGroup.appendChild(label);
+                    formGroup.appendChild(input);
+                    modalFormFields.appendChild(formGroup);
+                });
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeAddModal() {
+            modal.style.display = 'none';
+        }
+
+        // Sự kiện cho nút "Thêm mới"
+        document.querySelectorAll('.add-new-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tableName = this.dataset.table;
+                const columns = this.dataset.columns.split(',');
+                openDataModal(tableName, columns); // Mở modal ở chế độ thêm mới
+            });
+        });
+
+        // Đóng modal
+        modal.querySelector('.btn-cancel').addEventListener('click', closeAddModal);
+        modal.querySelector('.btn-close-modal').addEventListener('click', closeAddModal);
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) closeAddModal();
+        });
+
+        // SỬA ĐỔI: Xử lý submit form cho cả Thêm và Sửa
+        addDataForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+            const mode = this.dataset.mode;
+            const rowId = this.dataset.rowId;
+            const primaryKeyColumn = document.querySelector(`#table-${currentTable} th`).textContent;
+
+            // Loại bỏ khóa chính khỏi dữ liệu gửi đi khi cập nhật
+            if (mode === 'edit') {
+                delete data[primaryKeyColumn];
+            }
+
+            const url = mode === 'add' ? `/add/${currentTable}`
+                                     : `/update/${currentTable}/${primaryKeyColumn}/${rowId}`;
+            const method = mode === 'add' ? 'POST' : 'PUT';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Có lỗi xảy ra');
+                }
+
+                const result = await response.json();
+                alert(`Thao tác thành công!`);
+                closeAddModal();
+                // Tải lại trang để xem thay đổi, hoặc bạn có thể cập nhật hàng trong bảng bằng JS
+                window.location.reload(); 
+
+            } catch (error) {
+                alert(`Lỗi: ${error.message}`);
+            }
+        });
+
+
+        // THÊM MỚI: Xử lý bật/tắt chế độ sửa
+        document.querySelectorAll('.toggle-edit-mode-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tableWrapper = this.closest('.table-wrapper');
+                const table = tableWrapper.querySelector('table');
+                table.classList.toggle('edit-mode');
+                this.classList.toggle('active');
+            });
+        });
+
+    // ==== THÊM DÒNG NÀY ĐỂ XỬ LÝ NÚT ĐÓNG 'X' Ở HEADER ====
+    modal.querySelector('.btn-close-modal').addEventListener('click', closeAddModal);
+
+    // Xử lý bật/tắt chế độ xóa
+    document.querySelectorAll('.toggle-delete-mode-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Lấy bảng tương ứng với nút được bấm
+            const tableWrapper = this.closest('.table-wrapper');
+            const table = tableWrapper.querySelector('table');
+            
+            // Bật/tắt class 'delete-mode' và class 'active' của nút
+            table.classList.toggle('delete-mode');
+            this.classList.toggle('active');
+        });
+    });
+
+    // Xử lý khi bấm nút xóa trên từng hàng
+    document.querySelectorAll('table tbody').forEach(tbody => {
+            tbody.addEventListener('click', async function(event) {
+                const target = event.target.closest('button');
+                if (!target) return;
+
+                const row = target.closest('tr');
+                const tableWrapper = this.closest('.table-wrapper');
+                const tableName = tableWrapper.id.replace('table-', '');
+                const rowId = target.dataset.id;
+                
+                // Xử lý nút Sửa
+                if (target.classList.contains('edit-row-btn')) {
+                    const headers = Array.from(tableWrapper.querySelectorAll('th')).map(th => th.textContent);
+                    const cells = Array.from(row.querySelectorAll('td')).map(td => td.textContent);
+
+                    const rowData = headers.reduce((obj, header, index) => {
+                        // Bỏ qua các cột hành động ở cuối
+                        if (header !== 'Sửa' && header !== 'Hành động') {
+                           obj[header] = cells[index];
+                        }
+                        return obj;
+                    }, {});
+
+                    openDataModal(tableName, headers.filter(h => h !== 'Sửa' && h !== 'Hành động'), rowData);
+                }
+
+                // Xử lý nút Xóa
+                if (target.classList.contains('delete-row-btn')) {
+                    const primaryKeyColumn = tableWrapper.querySelector('th').textContent;
+                    if (confirm(`Bạn có chắc chắn muốn xóa hàng có ID = ${rowId} không?`)) {
+                        try {
+                            const response = await fetch(`/delete/${tableName}/${primaryKeyColumn}/${rowId}`, {
+                                method: 'DELETE'
+                            });
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.detail || 'Không thể xóa dữ liệu.');
+                            }
+                            row.remove();
+                            alert('Đã xóa thành công!');
+                        } catch (error) {
+                            alert(`Lỗi: ${error.message}`);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

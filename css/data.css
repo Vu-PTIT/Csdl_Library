@@ -1,0 +1,340 @@
+html,body {
+  font-family: 'Poppins', sans-serif;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* Ngăn chặn cuộn trang */
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+h2 {
+  margin: 10px 0 5px;
+  font-size: 24px;
+  color: #2c3e50;
+}
+
+h3 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: #222;
+}
+
+/* === CONTAINER & LAYOUT === */
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.sidebar {
+  width: 12%;
+  border-right: 1px solid #ccc;
+  padding-right: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.sidebar li:hover, .sidebar li.active {
+  background-color: #ff0000;
+  color: white;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  position: relative;
+  overflow-y: auto;
+}
+
+/* === TABLE STYLES === */
+.table-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #fff;
+  display: none;
+  white-space: nowrap;
+}
+
+.table-wrapper.active {
+  display: block;
+}
+
+table {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+  white-space: nowrap;
+}
+
+th, td {
+  padding: 12px 10px; /* Tăng padding cho dễ nhìn hơn */
+  border: 1px solid #ccc;
+  text-align: left;
+  white-space: normal; /* Cho phép văn bản tự xuống dòng */
+  word-break: break-word; /* Ngắt từ nếu cần để không bị tràn */
+  vertical-align: middle; /* Căn giữa nội dung theo chiều dọc */
+}
+th {
+  background-color: #ff0000;
+  color: white;
+  top: 0;
+  z-index: 1;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+  background-color: #eaf2f8;
+}
+
+/* === SEARCH BAR === */
+.search-container {
+  top: 0;
+  height: 60px;
+  box-sizing: border-box;
+  z-index: 10;
+  background-color: white;
+  padding: 10px;
+  margin-top: 15px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+}
+
+#searchInput {
+    width: 100%;
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: -1px;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: #ff0000;
+}
+
+#searchButton {
+    width: 40px;
+    padding: 8px;
+    border: 1px solid #ff0000;
+    background-color: #ff0000;
+    color: white;
+    cursor: pointer;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#searchButton:hover {
+    background-color: #e00000;
+}
+
+/* === MODAL (POP-UP FORM) === */
+.modal-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #eee;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.btn-close-modal {
+    border: none;
+    background: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+}
+
+#modal-form-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#modal-form-fields .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#modal-form-fields label {
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
+}
+
+#modal-form-fields input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 25px;
+    border-top: 1px solid #eee;
+    gap: 10px;
+}
+
+.modal-footer button {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.modal-footer .btn-save {
+    background-color: #ff0000;
+    color: white;
+    border-color: #ff0000;
+}
+
+.modal-footer .btn-cancel {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+
+/* === ACTION BUTTONS (ADD, EDIT, DELETE) - REFACTORED === */
+
+/* Container cho các nút để tạo khoảng cách bằng `gap` */
+.table-wrapper > div:nth-of-type(1) {
+    display: flex;
+    gap: 10px; /* Tạo khoảng cách 10px giữa các nút */
+    margin-bottom: 15px; /* Tạo khoảng cách với bảng bên dưới */
+}
+
+/*
+ * Kiểu chung cho tất cả các nút hành động (Thêm, Sửa, Xóa).
+ * Tất cả đều có màu đỏ theo yêu cầu.
+*/
+.add-new-btn,
+.toggle-edit-mode-btn,
+.toggle-delete-mode-btn {
+    background-color: #dc3545; /* Màu đỏ nhất quán */
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s, box-shadow 0.2s; /* Hiệu ứng chuyển động mượt */
+}
+
+/* Hiệu ứng khi di chuột qua */
+.add-new-btn:hover,
+.toggle-edit-mode-btn:hover,
+.toggle-delete-mode-btn:hover {
+    background-color: #c82333; /* Màu đỏ đậm hơn */
+}
+
+/* Hiệu ứng "active" (phát sáng) khi chế độ Sửa hoặc Xóa được bật */
+.toggle-edit-mode-btn.active,
+.toggle-delete-mode-btn.active {
+    background-color: #c82333;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.7);
+}
+
+
+/* === EDIT/DELETE COLUMNS & ICONS IN TABLE === */
+
+/* Mặc định ẩn cột Sửa và Xóa */
+.col-edit,
+.col-delete {
+    display: none;
+}
+
+/* Hiện cột Sửa khi bảng có class 'edit-mode' */
+table.edit-mode .col-edit {
+    display: table-cell;
+    text-align: center;
+}
+
+/* Hiện cột Xóa khi bảng có class 'delete-mode' */
+table.delete-mode .col-delete {
+    display: table-cell;
+    text-align: center;
+}
+
+/* Kiểu cho các nút icon Sửa/Xóa trong từng hàng */
+.edit-row-btn,
+.delete-row-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.edit-row-btn { color: #dc3545; } /* Icon sửa màu xanh */
+.delete-row-btn { color: #dc3545; } /* Icon xóa màu đỏ */
+
+.edit-row-btn:hover,
+.delete-row-btn:hover {
+    opacity: 1;
+}
