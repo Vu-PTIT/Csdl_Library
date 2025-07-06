@@ -22,6 +22,7 @@
         </div>
         <div class="content">
             <div >
+                <h1>LIBRARY MANAGEMENT SYSTEM</h1>
                 <div class="search-container">
                     <input type="text" id="searchInput" placeholder="Tìm kiếm trong tất cả các bảng...">
                     <button id="searchButton"><i class="fas fa-search"></i></button>
@@ -158,22 +159,20 @@
         let currentTable = '';
 
         // SỬA ĐỔI: Hàm mở Modal để xử lý cả Thêm và Sửa
+        // Dán và thay thế toàn bộ hàm openDataModal cũ bằng hàm này
         function openDataModal(tableName, columns, rowData = null) {
             currentTable = tableName;
             modalFormFields.innerHTML = '';
-            addDataForm.reset(); // Xóa dữ liệu form cũ
-
-            const primaryKey = columns[0].toLowerCase();
+            addDataForm.reset(); 
 
             if (rowData) {
-                // Chế độ Sửa
+                // Chế độ Sửa (Không thay đổi)
                 modalTitle.textContent = 'Sửa dữ liệu';
                 addDataForm.dataset.mode = 'edit';
                 addDataForm.dataset.rowId = rowData[columns[0]]; 
 
                 columns.forEach(column => {
                     const isPrimaryKey = column === columns[0];
-
                     const formGroup = document.createElement('div');
                     formGroup.className = 'form-group';
                     const label = document.createElement('label');
@@ -184,7 +183,6 @@
                     input.id = column;
                     input.name = column;
 
-                    // Trong chế độ sửa, khóa chính chỉ hiển thị, không cho phép chỉnh sửa
                     if (isPrimaryKey) {
                         input.readOnly = true;
                     }
@@ -199,13 +197,14 @@
                 });
 
             } else {
-                // Chế độ Thêm
+                // Chế độ Thêm (ĐÃ ĐƯỢC CẬP NHẬT)
                 modalTitle.textContent = 'Thêm dữ liệu mới';
                 addDataForm.dataset.mode = 'add';
                 addDataForm.dataset.rowId = '';
 
-                // Bỏ qua cột đầu tiên (khóa chính) khi tạo form thêm mới
-                columns.slice(1).forEach(column => {
+                // SỬA ĐỔI: Không bỏ qua cột khóa chính nữa
+                // Giờ đây form sẽ hiển thị tất cả các cột để người dùng nhập liệu
+                columns.forEach(column => {
                     const formGroup = document.createElement('div');
                     formGroup.className = 'form-group';
                     const label = document.createElement('label');
